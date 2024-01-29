@@ -1,0 +1,20 @@
+log:
+  format: json
+  # access логи находятся в level:DEBUG, поддержки тела запроса нет
+  level: DEBUG
+
+api:
+  insecure: true
+  dashboard: true
+
+entryPoints:
+  https:
+    address: ":443"
+
+providers:
+  file:
+    directory: /file_provider
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: true
+    defaultRule: "HostRegexp(`{{ index .Labels \"com.docker.compose.service\"}}.traefik.me`)"

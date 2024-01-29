@@ -1,0 +1,17 @@
+log:
+  format: json
+  # access логи находятся в level:DEBUG, поддержки тела запроса нет
+  level: DEBUG
+
+providers:
+  docker: true
+  file:
+    directory: /file_provider
+    watch: true
+
+entrypoints:
+  web:
+    address: :80
+
+api:
+  dashboard: true

@@ -1,0 +1,27 @@
+version: '3'
+services:
+  # https://traefik.traefik.me
+  traefik:
+    restart: unless-stopped
+    image: traefik:v2.0.2
+    ports:
+      - "443:443"
+    labels:
+      # без loadbalancer.server.port=8080 не работает dashboard
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "traefik.http.routers.traefik-tls.tls.domains[0].main=traefik.traefik.me"
+    volumes:
+      - .docker/traefik/certs:/certs
+      - .docker/traefik/traefik.yml:/traefik.yml
+      - .docker/traefik/file_provider:/file_provider
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # https://nginx_client.traefik.me
+  nginx_client:
+    image: nginx:alpine
+    volumes:
+      - .docker/nginx_client/index.html:/usr/share/nginx/html/index.html
+    labels:
+      ## раскомментировать чтобы открыть http:
+      #- "traefik.http.routers.nginx_client.rule=Host(`nginx_client.traefik.me`)"
+      - "traefik.http.routers.nginx_client-tls.tls.domains[0].main=nginx_client.traefik.me"

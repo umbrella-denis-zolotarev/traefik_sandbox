@@ -1,0 +1,40 @@
+version: '3'
+services:
+  traefik:
+    image: traefik:v2.2
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 80:80
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - .docker/traefik/traefik.yml:/traefik.yml:ro
+      - .docker/traefik/file_provider:/file_provider
+    labels:
+      - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.service=api@internal"
+
+  nginx_client:
+    image: nginx:alpine
+    volumes:
+      - .docker/nginx_client/index.html:/usr/share/nginx/html/index.html
+    ports:
+      - 8808:80
+    ## если это не писать, то hostname определится как nginx-client-ИМЯ_ПАПКИ_ПРОЕКТА
+    ## (подчеркивание заменится на тире) http://nginx-client-no-ssl
+    #labels:
+    #  - "traefik.http.routers.nginx_client.rule=Host(`nginx_client.local`)"
+    #  - "traefik.http.routers.nginx_client.entrypoints=web"
+  nginx_server:
+    image: nginx:alpine
+    volumes:
+      - .docker/nginx_server/index.html:/usr/share/nginx/html/index.html
+    ports:
+      - 8880:80
+    ## http://nginx-server-no-ssl
+    #labels:
+    #  - "traefik.http.routers.nginx_server.rule=Host(`nginx_server.local`)"
+    #  - "traefik.http.routers.nginx_server.entrypoints=web"

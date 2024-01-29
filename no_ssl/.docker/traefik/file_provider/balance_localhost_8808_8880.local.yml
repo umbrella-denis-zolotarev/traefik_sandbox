@@ -1,0 +1,13 @@
+http:
+  routers:
+    nginx_client:
+      rule: Host(`balance_localhost_8808_8880.local`)
+      entrypoints: web
+      service: serviceNginxClient
+  services:
+    serviceNginxClient:
+      # балансирует между этими серверами (localhost:8808 и localhost:8880)
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:8808
+          - url: http://host.docker.internal:8880
